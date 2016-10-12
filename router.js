@@ -13,7 +13,8 @@ var renderer = require("./renderer.js");
 		response.writeHead(200, {'content-Type' :'text/plain'});
 		renderer.view("header",{}, response);
 		renderer.view('search', {}, response);
-		response.end('footer', {}, response);
+		renderer.view('footer', {}, response);
+		response.end();
 	}
 
 	//if url == "/" && POST
@@ -28,7 +29,7 @@ function user(request, response){
 	if (username.length > 0) {
 
 		response.writeHead(200, {'content-Type' :'text/plain'});
-		response.write('Header\n');
+		renderer.view("header",{}, response);
 
 		//get JSON
 		var studentProfile = new Profile(username);
@@ -47,13 +48,17 @@ function user(request, response){
 			//simple response
 		renderer.view('profile', values, response);
 		response.view('footer', {}, response);
+		response.end();
 
 		});
 
 		//on error
 		studentProfile.on("error", function(error){
 			//show error
-			response.end('Footer\n');
+			renderer.view('error', {}, response);
+			renderer.view('search', {}, response);
+			response.view('footer', {}, response);
+			response.end();
 		});
 	
 

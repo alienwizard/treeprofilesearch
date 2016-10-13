@@ -1,24 +1,58 @@
 var Profile = require("./profile.js");
 var renderer = require("./renderer.js");
+var querystring = require("querystring");
 
 
 
+var commonHeader = {'content-Type' :'text/html'};
 
 	
 	function home(request, response){
 
 	//if url == "/" && GET
 	if(request.url === "/"){
+
+		if (request.method.toLowerCase() === "get") {
+
+
 		//show search
-		response.writeHead(200, {'content-Type' :'text/plain'});
+		response.writeHead(200, commonHeader);
 		renderer.view("header",{}, response);
 		renderer.view('search', {}, response);
 		renderer.view('footer', {}, response);
 		response.end();
+
+		}else{
+
+				//if url == "/" && POST
+
+					//get the psot data from body
+					request.on("data", function(postBody){
+
+						var body = postBody.toString();
+
+						var query =  querystring.parse(body);
+
+
+						response.writeHead(303, {"Location": "/" + query.username});
+						response.end();
+
+
+
+
+					})
+
+					//exctract the username
+
+
+
+		//redirect to /:username
+
+
+			}
 	}
 
-	//if url == "/" && POST
-		//redirect to /:username
+
 
 }
 
@@ -28,7 +62,7 @@ function user(request, response){
 	var username = request.url.replace("/", "");
 	if (username.length > 0) {
 
-		response.writeHead(200, {'content-Type' :'text/plain'});
+		response.writeHead(200, commonHeader);
 		renderer.view("header",{}, response);
 
 		//get JSON
@@ -54,10 +88,11 @@ function user(request, response){
 
 		//on error
 		studentProfile.on("error", function(error){
+			console.log(error)
 			//show error
 			renderer.view('error', {}, response);
 			renderer.view('search', {}, response);
-			response.view('footer', {}, response);
+			renderer.view('footer', {}, response);
 			response.end();
 		});
 	
